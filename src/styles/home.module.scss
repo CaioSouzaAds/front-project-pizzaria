@@ -1,8 +1,62 @@
-.container{
-    color: red;
-    h1{
-        font-size: 100px;
-        color: blue;
-    }
+.containerCenter{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--gray-900);
+
 }
 
+.login{
+    margin-top: 2rem;
+    width: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+
+    form{
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    form buttom{
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    label {
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+        align-items: center; 
+        margin-top: -1rem;
+        color: var(--white);
+        padding: 1rem;
+        gap: 0.5rem; /* Espaçamento horizontal entre os elementos */
+    }
+    
+}
+
+.text{
+    margin-top: 1rem;
+    color: var(--white);
+    cursor: pointer;
+}
+
+.viewpassword{
+    justify-content: center;
+    align-items: center;
+  }
+
+@media (max-width: 620px){
+    .login{
+        width: 90%;
+    }
+    .img{
+        width: 90%;
+    }
+}

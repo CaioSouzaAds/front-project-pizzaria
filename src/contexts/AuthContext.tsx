@@ -31,8 +31,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   });
   const isAuthenticated = !!user;
 
-  async function signIn() {
-    alert("CLICOU NO LOGIN");
+  async function signIn({ email, password }: SignInProps) {
+    alert(`Email: ${email}, ${password}`);
   }
 
   return (

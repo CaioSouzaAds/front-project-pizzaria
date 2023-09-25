@@ -1,4 +1,4 @@
-import { useContext, FormEvent } from "react";
+import { useContext, FormEvent, useState } from "react";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -6,23 +6,30 @@ import Head from "next/head";
 import styles from "@/styles/home.module.scss";
 import { Input } from "../components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
 
 import { AuthContext } from "../contexts/AuthContext";
 
 import logoImg from "../../public/newlogo.png";
 
 export default function Home() {
+  const { signIn } = useContext(AuthContext);
+
   const [showPassword, setShowPassword] = useState(false);
 
-  const { signIn } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  console.log(email);
+  console.log(password);
 
   async function handleLogin(event: FormEvent) {
     event.preventDefault();
 
     let data = {
-      email: "algum@email.com",
-      password: "123123",
+      email,
+      password,
     };
 
     await signIn(data);
@@ -38,11 +45,18 @@ export default function Home() {
 
         <div className={styles.login}>
           <form onSubmit={handleLogin}>
-            <Input placeholder="Digite seu email" type="text" />
+            <Input
+              placeholder="Digite seu email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
             <Input
               placeholder="Sua senha"
               type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
 
             <label>

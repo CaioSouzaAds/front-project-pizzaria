@@ -1,3 +1,5 @@
+import { useContext, FormEvent } from "react";
+
 import Link from "next/link";
 import Image from "next/image";
 import Head from "next/head";
@@ -6,10 +8,25 @@ import { Input } from "../components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useState } from "react";
 
+import { AuthContext } from "../contexts/AuthContext";
+
 import logoImg from "../../public/newlogo.png";
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const { signIn } = useContext(AuthContext);
+
+  async function handleLogin(event: FormEvent) {
+    event.preventDefault();
+
+    let data = {
+      email: "algum@email.com",
+      password: "123123",
+    };
+
+    await signIn(data);
+  }
 
   return (
     <>
@@ -20,7 +37,7 @@ export default function Home() {
         <Image className={styles.img} src={logoImg} alt="Logo pizzaria" />
 
         <div className={styles.login}>
-          <form>
+          <form onSubmit={handleLogin}>
             <Input placeholder="Digite seu email" type="text" />
 
             <Input

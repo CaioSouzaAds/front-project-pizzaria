@@ -11,6 +11,8 @@ import logoImg from '../../../public/newlogo.png';
 
 import { AuthContext } from '../../contexts/AuthContext';
 
+import { toast } from 'react-toastify';
+
 export default function Signup() {
   const { signUp } = useContext(AuthContext);
 
@@ -24,7 +26,7 @@ export default function Signup() {
     event.preventDefault();
 
     if (name === '' || email === '' || password === '') {
-      alert('Dados incorretos, verifique e tente novamente');
+      toast.warning('PREENCHA TODOS CAMPOS.');
       return;
     }
 

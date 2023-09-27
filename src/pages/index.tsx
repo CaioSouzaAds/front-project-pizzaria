@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/Button';
 
 import { AuthContext } from '../contexts/AuthContext';
 
+import { toast } from 'react-toastify';
+
 import logoImg from '../../public/newlogo.png';
 
 export default function Home() {
@@ -27,7 +29,10 @@ export default function Home() {
   async function handleLogin(event: FormEvent) {
     event.preventDefault();
 
-    if (email === '' || password === '') return alert('Preencha os dados');
+    if (email === '' || password === '') {
+      toast.error('VERIFIQUE OS CAMPOS.');
+      return;
+    }
 
     setLoading(true);
 

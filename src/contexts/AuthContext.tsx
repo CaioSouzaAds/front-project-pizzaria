@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useState, useEffect } from 'react';
 import { api } from '../services/apiClient';
 
 import { destroyCookie, setCookie, parseCookies } from 'nookies';
@@ -54,6 +54,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
   });
   const isAuthenticated = !!user;
 
+  useEffect(() => {
+    // Buscar o token nos cookies
+    const { '@nextauth.token': token } = parseCookies();
+
+    const fetchUser = async () => {
+      try {
+        if (token) {
+          // Fazer a requisição à API para buscar informações do usuário
+          const response = await api.get('/me');
+          const { id, name, email } = response.data;
+
+          // Definir as informações do usuário no estado do componente
+          setUser({
+            id,
+            name,
+            email,
+          });
+        }
+      } catch (error) {
+        // Tratar erros na requisição à API
+        console.error('Erro ao buscar usuário:', error);
+
+        // Realizar o logout do usuário em caso de erro
+        signOut();
+      }
+    };
+
+    // Chamar a função fetchUser para buscar os dados do usuário
+    fetchUser();
+  }, []); // Este efeito é executado uma vez quando o componente é montado
+
   async function signIn({ email, password }: SignInProps) {
     try {
       const response = await api.post('/session', {
@@ -105,9 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated, signIn, signOut, signUp }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated, signIn, signOut, signUp }}>
       {children}
     </AuthContext.Provider>
   );

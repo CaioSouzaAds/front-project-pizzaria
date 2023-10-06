@@ -3,7 +3,7 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { parseCookies, destroyCookie } from 'nookies';
 import { AuthTokenError } from '../services/errors/AuthTokenError';
 
-// Fução para paginas que só users logados podem ter acesso.
+// Função para páginas que apenas usuários logados podem acessar.
 export function canSSRAuth<P extends { [key: string]: any }>(fn: GetServerSideProps<P>) {
   return async (ctx: GetServerSidePropsContext): Promise<GetServerSidePropsResult<P>> => {
     const cookies = parseCookies(ctx);

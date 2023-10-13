@@ -1,10 +1,8 @@
 import { createContext, ReactNode, useState, useEffect } from 'react';
 import { api } from '../services/apiClient';
-
+import { toast } from 'react-toastify';
 import { destroyCookie, setCookie, parseCookies } from 'nookies';
 import Router from 'next/router';
-
-import { toast } from 'react-toastify';
 
 type AuthContextData = {
   user: UserProps;
@@ -106,6 +104,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       //Passar o token para as proximas requisições
+      //@ts-ignore Element implicitly has an 'any' type because expression of type '"Authorization"' can't be used to index type 'HeadersDefaults'.Property 'Authorization' does not exist on type 'HeadersDefaults'.
       api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
       toast.success('Login realizado com sucesso.');

@@ -1,19 +1,36 @@
 import { useState, ChangeEvent } from 'react';
-import Image from 'next/image';
-import { Header } from '@/components/Header';
 import Head from 'next/head';
+import Image from 'next/image';
 import styles from './styles.module.scss';
-import { canSSRAuth } from '@/utils/canSSRAuth';
+import { Header } from '../../components/Header';
+
+import { canSSRAuth } from '../../utils/canSSRAuth';
+
 import { FiUpload } from 'react-icons/fi';
 
-export default function Product() {
+import { setupApiClient } from '../../services/api';
+
+type ItemProps = {
+  id: string;
+  name: string;
+};
+
+interface CategoryProps {
+  categoryList: ItemProps[];
+}
+
+export default function Product({ categoryList }: CategoryProps) {
   const [avatarUrl, setAvatarUrl] = useState('');
-  const [imageAvatar, setImageAvatar] = useState<File | null>(null);
+  const [imageAvatar, setImageAvatar] = useState<File | null>(null); // Defina o tipo como File | null
+
+  const [categories, setCategories] = useState(categoryList || []);
+  const [categorySelected, setCategorySelected] = useState(0);
 
   function handleFile(e: ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) {
       return;
     }
+
     const image = e.target.files[0];
 
     if (!image) {
@@ -26,15 +43,24 @@ export default function Product() {
     }
   }
 
+  //Quando você seleciona uma nova categoria na lista
+  function handleChangeCategory(event: ChangeEvent<HTMLSelectElement>) {
+    // console.log("POSICAO DA CATEGORIA SELECIONADA ", event.target.value)
+    //console.log('Categoria selecionada ', categories[event.target.value])
+
+    setCategorySelected(Number(event.target.value));
+  }
+
   return (
     <>
       <Head>
-        <title>Product</title>
+        <title>Novo produto - Sujeito Pizzaria</title>
       </Head>
       <div>
         <Header />
+
         <main className={styles.container}>
-          <h1>New product</h1>
+          <h1>Novo produto</h1>
 
           <form className={styles.form}>
             <label className={styles.labelAvatar}>
@@ -42,32 +68,34 @@ export default function Product() {
                 <FiUpload size={30} color="#FFF" />
               </span>
 
-              <input type="file" accept="image/png , image/jpeg" onChange={handleFile} />
+              <input type="file" accept="image/png, image/jpeg" onChange={handleFile} />
 
               {avatarUrl && (
                 <Image
                   className={styles.preview}
                   src={avatarUrl}
-                  alt="product photo"
-                  width={200}
-                  height={200}
+                  alt="Foto do produto"
+                  width={250}
+                  height={250}
                 />
               )}
             </label>
 
-            <select name="" id="">
-              <option value="" disabled selected hidden>
-                {/* Opção inicial: informativa, inacessível, pré-selecionada e invisível (disabled, selected, hidden). */}
-                Selecione a categoria
-              </option>
-              <option value="">Bebida</option>
-              <option value="">Pizzas</option>
-              <option value="">Sobremesas</option>
+            <select value={categorySelected} onChange={handleChangeCategory}>
+              {categories.map((item, index) => {
+                return (
+                  <option key={item.id} value={index}>
+                    {item.name}
+                  </option>
+                );
+              })}
             </select>
 
-            <input type="text" placeholder="Nome do item" className={styles.input} />
-            <input type="text" placeholder="Valor" className={styles.input} />
-            <textarea placeholder="Descrição" className={styles.input} />
+            <input type="text" placeholder="Digite o nome do produto" className={styles.input} />
+
+            <input type="text" placeholder="Preço do produto" className={styles.input} />
+
+            <textarea placeholder="Descreva seu produto..." className={styles.input} />
 
             <button className={styles.buttonAdd} type="submit">
               Cadastrar
@@ -80,7 +108,14 @@ export default function Product() {
 }
 
 export const getServerSideProps = canSSRAuth(async (ctx) => {
+  const apiClient = setupApiClient(ctx);
+
+  const response = await apiClient.get('/category');
+  //console.log(response.data);
+
   return {
-    props: {},
+    props: {
+      categoryList: response.data,
+    },
   };
 });

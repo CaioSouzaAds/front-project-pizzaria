@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from './styles.module.scss';
@@ -10,6 +10,8 @@ import { FiUpload } from 'react-icons/fi';
 
 import { setupApiClient } from '../../services/api';
 
+import { toast } from 'react-toastify';
+
 type ItemProps = {
   id: string;
   name: string;
@@ -20,6 +22,10 @@ interface CategoryProps {
 }
 
 export default function Product({ categoryList }: CategoryProps) {
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [description, setDescription] = useState('');
+
   const [avatarUrl, setAvatarUrl] = useState('');
   const [imageAvatar, setImageAvatar] = useState<File | null>(null); // Defina o tipo como File | null
 
@@ -51,10 +57,45 @@ export default function Product({ categoryList }: CategoryProps) {
     setCategorySelected(Number(event.target.value));
   }
 
+  async function handleRegister(event: FormEvent) {
+    event.preventDefault();
+
+    try {
+      const data = new FormData();
+
+      if (name === '' || price === '' || description === '' || imageAvatar === null) {
+        toast.error('Preencha todos os campos!');
+        return;
+      }
+
+      data.append('name', name);
+      data.append('price', price);
+      data.append('description', description);
+      data.append('category_id', categories[categorySelected].id);
+      data.append('file', imageAvatar);
+
+      const apiCliente = setupApiClient();
+
+      const response = await apiCliente.post('/product', data);
+      //console.log(response);
+      toast.success('Cadastrado com sucesso!');
+    } catch (err) {
+      console.log(err);
+      toast.error('Ops! Erro ao cadastrar');
+    }
+
+    setName('');
+    setPrice('');
+    setDescription('');
+    setImageAvatar(null);
+    setAvatarUrl('');
+    setCategorySelected(0);
+  }
+
   return (
     <>
       <Head>
-        <title>Novo produto - Sujeito Pizzaria</title>
+        <title>Novo produto</title>
       </Head>
       <div>
         <Header />
@@ -62,7 +103,7 @@ export default function Product({ categoryList }: CategoryProps) {
         <main className={styles.container}>
           <h1>Novo produto</h1>
 
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={handleRegister}>
             <label className={styles.labelAvatar}>
               <span>
                 <FiUpload size={30} color="#FFF" />
@@ -82,6 +123,9 @@ export default function Product({ categoryList }: CategoryProps) {
             </label>
 
             <select value={categorySelected} onChange={handleChangeCategory}>
+              <option key={0} value={0}>
+                Selecione uma categoria
+              </option>
               {categories.map((item, index) => {
                 return (
                   <option key={item.id} value={index}>
@@ -91,11 +135,28 @@ export default function Product({ categoryList }: CategoryProps) {
               })}
             </select>
 
-            <input type="text" placeholder="Digite o nome do produto" className={styles.input} />
+            <input
+              value={name}
+              type="text"
+              placeholder="Digite o nome do produto"
+              className={styles.input}
+              onChange={(e) => setName(e.target.value)}
+            />
 
-            <input type="text" placeholder="Preço do produto" className={styles.input} />
+            <input
+              value={price}
+              type="text"
+              placeholder="Preço do produto"
+              className={styles.input}
+              onChange={(e) => setPrice(e.target.value)}
+            />
 
-            <textarea placeholder="Descreva seu produto..." className={styles.input} />
+            <textarea
+              value={description}
+              placeholder="Descreva seu produto..."
+              className={styles.input}
+              onChange={(e) => setDescription(e.target.value)}
+            />
 
             <button className={styles.buttonAdd} type="submit">
               Cadastrar
